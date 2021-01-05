@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+  app:
+    image: node:lts-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /usr/src/vocca-server/node_modules
+      - .:/usr/src/vocca-server
+    working_dir: /usr/src/vocca-server
+    ports:
+      - '4000:4000'
+    command: ash -c 'yarn && yarn dev'
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql:latest
+    command: --lower_case_table_names=1
+    volumes:
+      - ./docker/db/data:/var/lib/mysql
+      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: vocca
+      MYSQL_PASSWORD: vocca
+      MYSQL_DATABASE: vocca
